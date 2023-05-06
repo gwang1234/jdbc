@@ -1,11 +1,12 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+package textboard;
 
-public class JDBCConnectionTest {
+import java.sql.*;
+
+public class JDBCInsertTest {
   public static void main(String[] args) {
 
     Connection conn = null;
+    PreparedStatement pstat= null;
 
     try{
       Class.forName("com.mysql.jdbc.Driver");
@@ -13,7 +14,17 @@ public class JDBCConnectionTest {
       String url = "jdbc:mysql://127.0.0.1:3306/text_board?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
 
       conn = DriverManager.getConnection(url, "root", "5615");
-      System.out.println("연결 성공");
+
+      String sql ="INSERT INTO article ";
+      sql+="set regdate=now()";
+      sql+=", updateDate =NOW()";
+      sql+=", title=CONCAT('제목',RAND())";
+      sql+=", `body`=CONCAT('내용',RAND());";
+
+      pstat = conn.prepareStatement(sql);
+      int affectedRows=pstat.executeUpdate();
+
+      System.out.println("affectedRows:"+affectedRows);
 
     }
     catch(ClassNotFoundException e){
@@ -31,6 +42,14 @@ public class JDBCConnectionTest {
       catch( SQLException e){
         e.printStackTrace();
       }
+      try{
+        if(pstat !=null&&!pstat.isClosed()){
+          pstat.close();
+        }
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+
     }
   }
 }
